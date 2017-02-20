@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">Popular Movie App1</string>
+    <string name="rate">Sort by Top Rate</string>
+    <string name="popular">Sort by Most Popular</string>
+    <string name="error">Not able to fetch data from server, please check url.</string>
+    <string name="text">TextView</string>
+    <string name="action_settings">Settings</string>
+    <!-- Value in SharedPreferences for red color option -->
+    <string name="pref_color_red_value" translatable="false">red</string>
+    <!-- Value in SharedPreferences for blue color option -->
+    <string name="pref_color_blue_value" translatable="false">blue</string>
+    <!-- Value in SharedPreferences for green color option -->
+    <string name="pref_color_green_value" translatable="false">green</string>
+
+    <string name="pref_order_key" translatable="false">key</string>
+    <string name="pref_order_label">Sort by :</string>
+    <string name="pref_order_label_popular">Popular</string>
+    <string name="pref_order_label_rate">Top Rate</string>
+    <string name="pref_order_popular_value" translatable="false">popular</string>
+    <string name="pref_order_rate_value" translatable="false">top_rated</string>
+
+
+
+</resources>

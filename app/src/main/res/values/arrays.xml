@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Label ordering must match values -->
+    <array name="pref_order_option_labels">
+        <item>@string/pref_order_label_popular</item>
+        <item>@string/pref_order_label_rate</item>
+    </array>
+
+    <array name="pref_order_option_values">
+        <item>@string/pref_order_popular_value</item>
+        <item>@string/pref_order_rate_value</item>
+    </array>
+</resources>
