@@ -1,6 +1,11 @@
 
 <resources>
-    <color name="colorPrimary">#2196F3</color>
+    <!--<color name="colorPrimary">#2196F3</color>-->
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="darkBlack">#212121</color>
+    <color name="green">#009688</color>
+    <color name="white">#FFFF</color>
+    <color name="dark_blue">#456173</color>
+
 </resources>

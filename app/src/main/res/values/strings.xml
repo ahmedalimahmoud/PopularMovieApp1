@@ -1,23 +1,26 @@
 <resources>
     <string name="app_name">Popular Movie App1</string>
-    <string name="rate">Sort by Top Rate</string>
-    <string name="popular">Sort by Most Popular</string>
     <string name="error">Not able to fetch data from server, please check url.</string>
-    <string name="text">TextView</string>
+    <string name="movie_title">Movie Title</string>
     <string name="action_settings">Settings</string>
-    <!-- Value in SharedPreferences for red color option -->
-    <string name="pref_color_red_value" translatable="false">red</string>
-    <!-- Value in SharedPreferences for blue color option -->
-    <string name="pref_color_blue_value" translatable="false">blue</string>
-    <!-- Value in SharedPreferences for green color option -->
-    <string name="pref_color_green_value" translatable="false">green</string>
-
+    <string name="release_date">Release Date</string>
+    <string name="overview"> a general explanation or description of something — overview in a sentence.</string>
+    <string name="trailer_name"> Trailer Name</string>
+    <string name="trailer_label"> Trailers :</string>
+    <string name="author_name"> Author</string>
+    <string name="review"> Review</string>
+    <string name="view_reviews_btn">View Review</string>
     <string name="pref_order_key" translatable="false">key</string>
     <string name="pref_order_label">Sort by :</string>
     <string name="pref_order_label_popular">Popular</string>
     <string name="pref_order_label_rate">Top Rate</string>
+    <string name="pref_order_label_favourite">Favourite</string>
     <string name="pref_order_popular_value" translatable="false">popular</string>
     <string name="pref_order_rate_value" translatable="false">top_rated</string>
+    <string name="pref_order_favourite_value" translatable="false">favourite</string>
+    <string name="header">Header</string>
+    <string name="divider">Divider</string>
+    <string name="playTrailer">Play Trailer</string>
 
 
 

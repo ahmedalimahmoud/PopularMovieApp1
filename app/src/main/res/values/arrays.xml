@@ -4,10 +4,13 @@
     <array name="pref_order_option_labels">
         <item>@string/pref_order_label_popular</item>
         <item>@string/pref_order_label_rate</item>
+        <item>@string/pref_order_label_favourite</item>
+
     </array>
 
     <array name="pref_order_option_values">
         <item>@string/pref_order_popular_value</item>
         <item>@string/pref_order_rate_value</item>
+        <item>@string/pref_order_favourite_value</item>
     </array>
 </resources>

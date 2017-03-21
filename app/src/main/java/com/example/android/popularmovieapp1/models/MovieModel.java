@@ -14,6 +14,16 @@ public class MovieModel implements Parcelable {
     private String overview;
     private String release_date;
     private String original_title;
+    private int id;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     private float vote_average;
 
     private MovieModel(Parcel in) {
@@ -22,6 +32,7 @@ public class MovieModel implements Parcelable {
         release_date = in.readString();
         original_title = in.readString();
         vote_average = in.readFloat();
+        id = in.readInt();
     }
 
     public static final Creator<MovieModel> CREATOR = new Creator<MovieModel>() {
@@ -92,5 +103,6 @@ public class MovieModel implements Parcelable {
         parcel.writeString(release_date);
         parcel.writeString(original_title);
         parcel.writeFloat(vote_average);
+        parcel.writeInt(id);
     }
 }

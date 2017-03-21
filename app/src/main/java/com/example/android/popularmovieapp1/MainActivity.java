@@ -1,23 +1,32 @@
 
 package com.example.android.popularmovieapp1;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.android.popularmovieapp1.data.MovieContract;
 import com.example.android.popularmovieapp1.models.MovieModel;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,26 +43,56 @@ import java.util.List;
 
 @SuppressWarnings("ALL")
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<MovieModel>>,SharedPreferences.OnSharedPreferenceChangeListener{
-
+    private Cursor mCursor;
     private static final String SEARCH_QUERY_URL_EXTRA = "query";
-    private static final int GITHUB_SEARCH_LOADER = 22;
-    private   MoviesAdapter mAdapter;
-    private RecyclerView recyclerView;
-    //GridView gvMovies;
-    private GridLayoutManager layoutManager;
-    final String api_key="21ba08e3b68174860025a5de7e5640cc";
+    public static final int GITHUB_SEARCH_LOADER = 22;
+    GridView gvMovies;
+     MovieAdapter mAdapter;
+    static final String api_key="21ba08e3b68174860025a5de7e5640cc";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //gvMovies=(GridView) findViewById(R.id.gvMovies);
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        layoutManager= new GridLayoutManager(MainActivity.this, 2);
-        recyclerView.setLayoutManager(layoutManager);
-        getSupportLoaderManager().initLoader(GITHUB_SEARCH_LOADER, null, this);
+        gvMovies=(GridView) findViewById(R.id.gvMovies);
+        //getSupportLoaderManager().initLoader(GITHUB_SEARCH_LOADER, null, this);
         setupSharedPreferences();
     }
+public  void runFavourite()
+{
 
+
+    final List<MovieModel> movieModelList = new ArrayList<>();
+    Cursor res=getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI,
+            null,
+            null,
+            null,
+            null);
+    res.moveToFirst();
+    while (res.isAfterLast()==false) {
+        MovieModel movieModel = new MovieModel();
+        movieModel.setPoster_path(res.getString(res.getColumnIndex(MovieContract.MovieEntry.COLUMN_POSTER)));
+        movieModel.setOriginal_title(res.getString(res.getColumnIndex(MovieContract.MovieEntry.COLUMN_TITLE)));
+        movieModel.setOverview(res.getString(res.getColumnIndex(MovieContract.MovieEntry.COLUMN_OVERVIEW)));
+        movieModel.setId(res.getInt(res.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID)));
+        movieModel.setVote_average(res.getFloat(res.getColumnIndex(MovieContract.MovieEntry.COLUMN_RATE)));
+        movieModel.setRelease_date(res.getString(res.getColumnIndex(MovieContract.MovieEntry.COLUMN_RELEASE)));
+        movieModelList.add(movieModel);
+        res.moveToNext();
+    }
+    res.close();
+    mAdapter=new MovieAdapter(this,R.layout.row,movieModelList);
+    gvMovies.setAdapter(mAdapter);
+    gvMovies.setOnItemClickListener(new AdapterView.OnItemClickListener() {  // list item click opens a new detailed activity
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            MovieModel movieModel = movieModelList.get(position); // getting the model
+            Toast.makeText(getApplicationContext(),movieModel.getOriginal_title(),Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(MainActivity.this, MovieDetailsActivity.class);
+            intent.putExtra("movie", movieModel);
+            startActivity(intent);
+        }
+    });
+}
 
     private void setupSharedPreferences() {
         // Get all of the values from shared preferences to set it up
@@ -63,9 +102,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 
-    private void loadURL(SharedPreferences sharedPreferences) {
-        runQuery(sharedPreferences.getString(getString(R.string.pref_order_key),
-                getString(R.string.pref_order_popular_value)));
+    private  void loadURL(SharedPreferences sharedPreferences) {
+
+        if(sharedPreferences.getString(getString(R.string.pref_order_key),
+                getString(R.string.pref_order_popular_value)).equals("favourite"))
+        {
+            runFavourite();
+        }
+        else {
+            runQuery(sharedPreferences.getString(getString(R.string.pref_order_key),
+                    getString(R.string.pref_order_popular_value)));
+        }
     }
 
 
@@ -86,9 +133,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-         if (key.equals(getString(R.string.pref_order_key))) {
+        if (key.equals(getString(R.string.pref_order_key))) {
             loadURL(sharedPreferences);
         }
+
     }
     @Override
     protected void onDestroy() {
@@ -140,7 +188,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     JSONObject parent = new JSONObject(finalJson);
                     JSONArray parentArray = parent.getJSONArray("results");
                     List<MovieModel> movieModelList = new ArrayList<>();
-                    movieModelList.clear();
                     for (int i = 0; i < parentArray.length(); i++) {
                         JSONObject finalObject = parentArray.getJSONObject(i);
                         MovieModel movieModel = new MovieModel();
@@ -149,9 +196,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         movieModel.setRelease_date(finalObject.getString("release_date"));
                         movieModel.setPoster_path(finalObject.getString("poster_path"));
                         movieModel.setVote_average((float) finalObject.getDouble("vote_average"));
-
+                        movieModel.setId(finalObject.getInt("id"));
                         movieModelList.add(movieModel);
                     }
+
                     return movieModelList;
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -185,72 +233,65 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<List<MovieModel>> loader, final List<MovieModel> result) {
         if (result != null) {
-            mAdapter = new MoviesAdapter((List<MovieModel>) result);
-            recyclerView.setAdapter(mAdapter);
-            recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getApplicationContext(), new RecyclerItemClickListener.OnItemClickListener() {
+
+            MovieAdapter adapter=new MovieAdapter(getApplicationContext(),R.layout.row,result);
+            gvMovies.setAdapter(adapter);
+
+            gvMovies.setOnItemClickListener(new AdapterView.OnItemClickListener() {  // list item click opens a new detailed activity
                 @Override
-                public void onItemClick(View view, int position) {
-                    MovieModel movie = result.get(position);
-                    Toast.makeText(getApplicationContext(), movie.getOriginal_title(), Toast.LENGTH_SHORT).show();
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    MovieModel movieModel = result.get(position); // getting the model
+                    Toast.makeText(getApplicationContext(),movieModel.getOriginal_title(),Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(MainActivity.this, MovieDetailsActivity.class);
-                    intent.putExtra("movie", movie);
+                    intent.putExtra("movie", movieModel);
                     startActivity(intent);
                 }
-            }));
-//            MovieAdapter adapter=new MovieAdapter(getApplicationContext(),R.layout.row,result);
-//            gvMovies.setAdapter(adapter);
-//
-//            gvMovies.setOnItemClickListener(new AdapterView.OnItemClickListener() {  // list item click opens a new detailed activity
-//                @Override
-//                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                    MovieModel movieModel = result.get(position); // getting the model
-//                    Toast.makeText(getApplicationContext(),movieModel.getOriginal_title(),Toast.LENGTH_LONG).show();
-//                    Intent intent = new Intent(MainActivity.this, MovieDetailsActivity.class);
-//                    intent.putExtra("movie", movieModel);
-//                    startActivity(intent);
-//                }
-//            });
+            });
         } else {
             Toast.makeText(getApplicationContext(), R.string.error, Toast.LENGTH_SHORT).show();
         }
 
     }
-//    public class MovieAdapter extends ArrayAdapter{
-//        private List<MovieModel> movieModelList;
-//        private final int resource;
-//        private final LayoutInflater inflater;
-//        public MovieAdapter(Context context, int resource, List<MovieModel> objects) {
-//            super(context, resource, objects);
-//            movieModelList=objects;
-//            this.resource=resource;
-//            inflater=(LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-//        }
-//
-//        @NonNull
-//        @Override
-//        public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-//            ViewHolder viewHolder=null;
-//            if(convertView==null)
-//            {   viewHolder=new ViewHolder();
-//                convertView=inflater.inflate(resource,null);
-//                viewHolder.ivMovieIcon =(ImageView)convertView.findViewById(R.id.ivMovieIcon);
-//                convertView.setTag(viewHolder);
-//            }else {
-//                viewHolder=(ViewHolder)convertView.getTag();
-//            }
-//            Picasso.with(getApplicationContext())
-//                    .load("http://image.tmdb.org/t/p/w185/"+movieModelList.get(position).getPoster_path())
-//                    .placeholder(R.drawable.loading)
-//                    .error(R.drawable.notfound)
-//                    .into(viewHolder.ivMovieIcon);
-//            return convertView;
-//
-//        }
-//        class ViewHolder
-//        {
-//            private ImageView ivMovieIcon;
-//        }
-//    }
+    public class MovieAdapter extends ArrayAdapter {
+        private List<MovieModel> movieModelList;
+        private Cursor mCursor;
+
+        private final int resource;
+        private final LayoutInflater inflater;
+        public MovieAdapter(Context context, int resource, List<MovieModel> objects) {
+            super(context, resource, objects);
+            movieModelList=objects;
+            this.resource=resource;
+            inflater=(LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        }
+
+        @NonNull
+        @Override
+        public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+            ViewHolder viewHolder=null;
+            if(convertView==null)
+            {   viewHolder=new ViewHolder();
+                convertView=inflater.inflate(resource,null);
+                viewHolder.ivMovieIcon =(ImageView)convertView.findViewById(R.id.ivMovieIcon);
+                convertView.setTag(viewHolder);
+            }else {
+                viewHolder=(ViewHolder)convertView.getTag();
+            }
+
+            Picasso.with(getApplicationContext())
+                    .load("http://image.tmdb.org/t/p/w185/"+movieModelList.get(position).getPoster_path())
+                    .placeholder(R.drawable.loading)
+                    .error(R.drawable.notfound)
+                    .into(viewHolder.ivMovieIcon);
+
+            return convertView;
+
+        }
+        class ViewHolder
+        {
+            private ImageView ivMovieIcon;
+        }
+    }
 
     @Override
     public void onLoaderReset(Loader<List<MovieModel>> loader) {
@@ -267,17 +308,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id=item.getItemId();
-
-        if (id==R.id.popular)
-        {
-            runQuery("popular");
-            return true;
-        }
-        if (id==R.id.rate)
-        {
-            runQuery("top_rated");
-            return true;
-        }
         if (id==R.id.activity_settings)
         {
             Intent startSettingsActivity = new Intent(this, SettingsActivity.class);

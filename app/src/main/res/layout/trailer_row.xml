@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="15dp">
+
+    <ImageView
+        android:layout_width="0dp"
+        android:layout_height="28dp"
+        android:background="@drawable/ic_play_arrow"
+        android:id="@+id/imageView3"
+        android:contentDescription="@string/playTrailer"
+        android:layout_weight="0.4"/>
+
+    <TextView
+        android:text="@string/trailer_name"
+        android:layout_width="0dp"
+        android:textSize="20sp"
+        android:paddingStart="10sp"
+        android:paddingEnd="10sp"
+        android:layout_height="wrap_content"
+        android:id="@+id/trailer_name"
+        android:layout_weight="2"
+        />
+
+</LinearLayout>
